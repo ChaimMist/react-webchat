@@ -1,9 +1,7 @@
 import {useState, useEffect} from 'react';
 import {ProfileComponent} from '../profileComponent/profileIcon'
 import {useSelector} from "react-redux";
-// import {addNotifications, addNotificationID} from "../../reduxFeatures/hasMessage";
 
-import '@fortawesome/fontawesome-free/js/fontawesome';
 import './sidebar.css'
 import {NavLink} from "react-router-dom";
 
@@ -15,10 +13,6 @@ export function SidebarComponent() {
     const [loggedIn, setLoggedIn] = useState(false);
     const [data, setData] = useState({name: "Profile", url: "https://chedvata.com/assets/profile.svg"});
     useEffect(() => {
-
-        console.log(notifications)
-
-
         document.getElementById("sidebar").addEventListener("mouseenter", function () {
             setActive(true);
         });
@@ -43,7 +37,7 @@ export function SidebarComponent() {
                         <NavLink to={"/chat"} className={" sidebarItem text-nowrap d-flex flex-row justify-content-between align-items-center"}>
                             <h5>Chat</h5>
                             <div className={"mb-1 rounded-circle bg-danger flex-column d-flex justify-content-center text-center text-white notification  width-height-25px "+(notifications>0?"":" d-none")}>
-                                <div>{notifications}</div>
+                                <div>{notifications>0?notifications:""}</div>
                             </div>
                         </NavLink>
                         <NavLink to={"/about-us"} className={"sidebarItem text-nowrap"}>

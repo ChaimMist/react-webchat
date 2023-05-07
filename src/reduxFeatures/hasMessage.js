@@ -5,14 +5,15 @@ export const hasMessageSlice = createSlice({
 
     initialState: {
             "main": 0,
-            "chaim": 0,
     },
     reducers: {
         addNotificationID: (state, action) => {
-            state[action.payload] = 0
+            if (state[action.payload] === undefined)
+                state[action.payload] = 0
+
         },
         addNotifications: (state, action) => {
-            state[action.payload] = state[action.payload] + 1
+            state[action.payload] += 1
         },
         removeNotifications: (state, action) => {
             state[action.payload[0]] -= action.payload[1]

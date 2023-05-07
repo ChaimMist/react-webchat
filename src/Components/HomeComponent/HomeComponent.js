@@ -43,10 +43,7 @@ export function HomeComponent() {
                                  style={{width: "30%", height: "200px", backgroundColor: 'rgba(230,255,0,0.41)'}}>
                             <div className={"fas text-dark fa-address-book text-dark fa-5x"}></div>
                         </InfoBox>
-                        <InfoBox className={"d-flex flex-row"} onClick={() => {
-                            dispatch(addNotifications("chaim"))
-                            dispatch(addNotifications("main"))
-                        }}
+                        <InfoBox className={"d-flex flex-row"}
                                  style={{width: "30%", height: "200px", backgroundColor: 'rgba(3,0,255,0.41)'}}>
                             <div className={"fas text-dark fa-lightbulb text-dark fa-5x"}></div>
                         </InfoBox>

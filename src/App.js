@@ -7,6 +7,9 @@ import {
 import {HomeComponent} from './Components/HomeComponent/HomeComponent';
 import {SidebarComponent} from './Components/sidebarComponent/sidebar';
 import {ChatComponent} from './Components/ChatComponent/ChatComponent';
+import {useDispatch, useSelector} from "react-redux";
+import {addNotificationID, addNotifications} from "./reduxFeatures/hasMessage";
+
 
 
 const router = createBrowserRouter([{
@@ -36,6 +39,15 @@ const router = createBrowserRouter([{
 
 
 function App() {
+
+    const dispatch = useDispatch()
+    const socket = useSelector(state => state.socket.socket)
+    socket.on('addNotification', (groupID) => {
+        dispatch(addNotificationID(groupID))
+        dispatch(addNotifications(groupID))
+    })
+
+
     return (
             <RouterProvider router={router}/>
     );

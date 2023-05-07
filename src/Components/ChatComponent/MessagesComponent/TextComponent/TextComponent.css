@@ -1,0 +1,12 @@
+.bg-me{
+    background-color: #bbf193;
+}
+.bg-sender{
+    background-color: #a0c7ff;
+}
+
+.text-component-box{
+    width: 40%;
+    min-width: 300px;
+    position: relative;
+}
