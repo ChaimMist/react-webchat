@@ -21,7 +21,6 @@ export const socketSlice = createSlice({
         socket: socket,
     },
     reducers: {
-
         dispatchEvent: (state, action) => {
             state.socket.emit(action.payload[0], action.payload[1])
         }

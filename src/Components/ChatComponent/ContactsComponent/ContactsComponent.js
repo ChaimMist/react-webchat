@@ -2,18 +2,19 @@ import {useState} from "react";
 import {useEffect} from "react";
 import {Contact} from "./Contact/Contact";
 import {useDispatch, useSelector} from "react-redux";
+import {setChats, addChat} from "../../../reduxFeatures/chats";
 import {addNotificationID} from "../../../reduxFeatures/hasMessage";
 import {dispatchEvent} from "../../../reduxFeatures/Socket";
 import './ContactsComponenet.css'
 import {v4 as uuidv4} from 'uuid';
 
 
-let allContacts = []
+let allChats = []
 
 export function ContactsComponent() {
     const dispatch = useDispatch()
     const userInfo = useSelector(state => state.userInfo)
-    const [contacts, setContacts] = useState(allContacts)
+    const chats = useSelector(state => state.chats.chats)
     const [searchedContacts, setSearchedContacts] = useState([{name: "No Results", phone: ""}])
     const [addedUsers, setAddedUsers] = useState([])
     console.log(userInfo)
@@ -24,9 +25,12 @@ export function ContactsComponent() {
     </div>
 
     useEffect(() => {
+
+        allChats = chats
+
         document.getElementById('searchContact').addEventListener('change', (e) => {
             let value = e.target.value
-            if (value == "") {
+            if (value.toString() === "") {
                 setSearchedContacts([{name: "No Results", phone: ""}])
                 return
             }
@@ -40,36 +44,20 @@ export function ContactsComponent() {
                 .then((data) => {
                     setSearchedContacts(data)
                 })
-
-
         })
         document.getElementById('contactsInput').addEventListener('input', (e) => {
             let value = e.target.value
-            let contacts = allContacts.filter((contact) => {
+            let contacts = allChats.filter((contact) => {
                 return contact.name.toLowerCase().includes(value.toLowerCase()) || contact.phone.includes(value)
             })
             if (contacts.length === 0) {
                 contacts = [{name: "No Results", phone: ""}]
             }
-            setContacts(contacts)
+            dispatch(setChats(contacts))
         });
 
-        fetch('/get-chats', {
-            method: 'POST', headers: {
-                'Content-Type': 'application/json'
-            }, body: JSON.stringify({id: userInfo.id}),
-        })
-            .then((res) => res.json())
-            .then((data) => {
-                allContacts = data
-                for (const item of data) {
-                    dispatch(addNotificationID(item.id))
+    }, [chats, dispatch, userInfo.id])
 
-                    dispatch(dispatchEvent(['join', item.id]))
-                }
-                setContacts(data)
-            })
-    }, [dispatch, userInfo.id])
 
     return (<div className={"bg-light contactsContainer overflow-auto "}>
             <div className={"sticky-top bg-light"}>
@@ -85,11 +73,11 @@ export function ContactsComponent() {
                 </div>
             </div>
             <div className={"contacts p-2"}>
-                {contacts[0] ? contacts.map((contact, index) => {
-                    if (contact.name == "No Results") return (
+                {chats[0] ? chats.map((chat, index) => {
+                    if (chat.name.toString() === "No Results") return (
                         <div className={"w-100 d-flex flex-row justify-content-center"}>No results.</div>)
 
-                    return (<Contact key={index} chat={contact}/>)
+                    return (<Contact key={index} chat={chat}/>)
                 }) : loader}
             </div>
 
@@ -131,7 +119,7 @@ export function ContactsComponent() {
                                             </div>
                                             <div className={"d-flex flex-row"}>
                                                 <button
-                                                    className={"btn btn-outline-primary " + (addedUsers.id == contact.id ? "disabled" : "")}
+                                                    className={"btn btn-outline-primary " + (addedUsers.some(obj => obj.id === contact.id) ? "disabled" : "")}
                                                     onClick={() => {
                                                         setAddedUsers([...addedUsers, contact])
                                                     }}
@@ -173,7 +161,7 @@ export function ContactsComponent() {
                                 <div className="modal-footer">
                                     <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Close
                                     </button>
-                                    <button type="button" className="btn btn-primary"
+                                    <button type="button" className="btn btn-primary" data-bs-dismiss="modal"
                                             onClick={() => {
                                                 let uuid = uuidv4()
                                                 fetch('/create-chat', {
@@ -189,12 +177,13 @@ export function ContactsComponent() {
                                                         chatID: uuid,
                                                     }),
                                                 }).then(() => {
-                                                    setContacts([...contacts, {
+                                                    dispatch(addChat([{
                                                         name: document.getElementById('chatNameInput').value,
                                                         image: "https://chedvata.com/assets/profile.svg",
                                                         id: uuid
-                                                    }])
+                                                    }]))
                                                     dispatch(dispatchEvent(['join', uuid]))
+                                                    dispatch(addNotificationID(uuid))
                                                 })
                                             }}
                                     >Create

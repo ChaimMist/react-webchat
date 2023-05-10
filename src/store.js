@@ -3,6 +3,7 @@ import notificationHash from './reduxFeatures/hasMessage';
 import currentSession from './reduxFeatures/currentSession';
 import userInfo from './reduxFeatures/userInfo';
 import socket from './reduxFeatures/Socket';
+import chats from './reduxFeatures/chats';
 
 export default configureStore({
     reducer: {
@@ -10,6 +11,7 @@ export default configureStore({
         currentSession: currentSession,
         userInfo: userInfo,
         socket: socket,
+        chats: chats,
     },
 })
 

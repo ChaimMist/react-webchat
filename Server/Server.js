@@ -26,19 +26,19 @@ io.on('connection', (socket) => {
 
     socket.on('notify', (data) => {
         console.log("notifying", data)
-        io.to(data.id).emit('addNotifications', {id: data.id, exclusion: data.exclusion})
+        io.to(data.id).emit('addNotifications', {id: data.id, senderID: data.senderID})
         io.to(data.id).emit('refetch', data.id)
     });
     socket.on('disconnect', () => {
         console.log('Disconnected from server');
     });
-
     socket.on('join', (roomID) => {
-        console.log("joined room " + roomID)
-        console.log()
         socket.join(roomID)
     })
-
+    socket.on('leave', (roomID) => {
+        console.log("left room " + roomID)
+        socket.leave(roomID)
+    })
 });
 
 

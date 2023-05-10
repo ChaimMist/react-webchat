@@ -10,8 +10,8 @@ export function SidebarComponent() {
     const notifications= useSelector((state) => state.notificationHash.main);
     // const dispatch = useDispatch();
     const [active, setActive] = useState(false);
-    const [loggedIn, setLoggedIn] = useState(false);
-    const [data, setData] = useState({name: "Profile", url: "https://chedvata.com/assets/profile.svg"});
+    // const [loggedIn, setLoggedIn] = useState(false);
+    const [data] = useState({name: "Profile", url: "https://chedvata.com/assets/profile.svg"});
     useEffect(() => {
         document.getElementById("sidebar").addEventListener("mouseenter", function () {
             setActive(true);
@@ -21,8 +21,8 @@ export function SidebarComponent() {
         });
 
         if (localStorage.getItem('token') !== null) {
-            setLoggedIn(true);
-            setData(localStorage.getItem('token'));
+            // setLoggedIn(true);
+            // setData(localStorage.getItem('token'));
         }
     }, []);
     if (active) {

@@ -27,7 +27,7 @@ export function MessagesComponent() {
             })
         }).then(() => {
             dispatch(dispatchEvent(["notify", {
-                id: currentSession.chatID, exclusion: [userInfo.id]
+                id: currentSession.chatID, senderID: [userInfo.id]
             }]))
             dispatch(addMessage({
                 user_id: userInfo.id,
@@ -56,8 +56,9 @@ export function MessagesComponent() {
                 document.getElementById("chat-body").scrollTo(0, document.getElementById("chat-body").scrollHeight, {behavior: "smooth"})
             })
         })
-        
-        document.getElementById("chat-body").scrollTo(0, document.getElementById("chat-body").scrollHeight,  {behavior: "smooth"})
+
+        //scroll to bottom of chat-body smoothly
+        document.getElementById("chat-body").scrollTo(0, document.getElementById("chat-body").scrollHeight)
 
         return () => {
             socket.off("refetch")
@@ -83,8 +84,8 @@ export function MessagesComponent() {
             <div id={"chat-body"} className={"chat-body p-5"}>
                 {currentSession.messages.length > 0 ? currentSession.messages.map((message, index) => {
                     return <TextComponent key={index}
-                                          sender={message.user_id == userInfo.id ? "me" : message.sender}
-                                          align={message.user_id == userInfo.id ? "end" : "start"}
+                                          sender={message.user_id.toString() === userInfo.id.toString() ? "me" : message.sender}
+                                          align={message.user_id.toString() === userInfo.id.toString() ? "end" : "start"}
                                           text={message.message}
                                           date={message.created_at}
                     />

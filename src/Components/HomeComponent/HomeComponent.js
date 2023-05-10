@@ -1,13 +1,7 @@
-
-import {useDispatch, useSelector} from "react-redux";
 import {InfoBox} from "../InfoBox/InfoBox";
-import {addNotifications} from "../../reduxFeatures/hasMessage";
 
 
 export function HomeComponent() {
-    const dispatch = useDispatch();
-    const notifiactions = useSelector((state) => state.notificationHash.main);
-
     return (<div className={"container-fluid p-5 vh-100"}>
             <div className={"d-flex flex-row"}>
                 <div className={"d-flex flex-column w-75"}>
