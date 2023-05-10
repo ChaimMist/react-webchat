@@ -63,7 +63,7 @@ app.post('/api/login', function (req, res) {
                  FROM users
                  WHERE email = ?
                    AND password = ?`
-    con.query(query, [email, password], function (err, result, fields) {
+    con.query(query, [email, password], function (err, result) {
         if (err) throw err;
         res.json(result);
     });
@@ -73,7 +73,7 @@ app.post('/get-chats', function (req, res) {
     let query = `SELECT id, name, image, updated_at
                  FROM chats
                  WHERE id in (SELECT chat_id FROM chat_participants WHERE chats.id = chat_id AND user_id = ?)`
-    con.query(query, [userID], function (err, result, fields) {
+    con.query(query, [userID], function (err, result) {
         if (err) {
             res.end("error")
             throw err;
@@ -94,7 +94,7 @@ app.post("/create-chat", function (req, res) {
     participants.push({id: userID, name: req.body.userName, image: req.body.userImage})
     let query = `INSERT INTO chats (id, name, image, created_at, updated_at)
                  VALUES (?, ?, ?, ?, ?)`
-    con.query(query, [chatID, chatName, chatImage, getDate_yyyy_mm_dd_HH_MM_SS(), getDate_yyyy_mm_dd_HH_MM_SS()], function (err, result, fields) {
+    con.query(query, [chatID, chatName, chatImage, getDate_yyyy_mm_dd_HH_MM_SS(), getDate_yyyy_mm_dd_HH_MM_SS()], function (err) {
         if (err) {
             console.log("error", err)
             return;
@@ -102,7 +102,7 @@ app.post("/create-chat", function (req, res) {
         for (let i = 0; i < participants.length; i++) {
             query = `INSERT INTO chat_participants (chat_id, user_id)
                      VALUES (?, ?)`
-            con.query(query, [chatID, participants[i].id], function (err, result, fields) {
+            con.query(query, [chatID, participants[i].id], function (err) {
                 if (err) {
                     console.log("error", err)
                 }
@@ -118,7 +118,7 @@ app.post('/get-contact', function (req, res) {
                  FROM users
                  WHERE name LIKE ?
                     or phone LIKE ?`
-    con.query(query, [`%${userInput}%`, `%${userInput}%`], function (err, result, fields) {
+    con.query(query, [`%${userInput}%`, `%${userInput}%`], function (err, result) {
         if (err) {
             res.end("error")
             throw err;
@@ -138,7 +138,7 @@ app.post('/get-messages', function (req, res) {
                           INNER JOIN users ON messages.user_id = users.id
                  WHERE chat_id = ?
                  ORDER BY messages.created_at ASC`
-    con.query(query, [chatID], function (err, result, fields) {
+    con.query(query, [chatID], function (err, result) {
         if (err) {
             console.log("error", err)
             return;
@@ -159,7 +159,7 @@ app.post('/send-message', function (req, res) {
     let message = req.body.message
     let query = `INSERT INTO messages (chat_id, user_id, message, created_at, updated_at)
                  VALUES (?, ?, ?, ?, ?)`
-    con.query(query, [chatID, userID, message, getDate_yyyy_mm_dd_HH_MM_SS(), getDate_yyyy_mm_dd_HH_MM_SS()], function (err, result, fields) {
+    con.query(query, [chatID, userID, message, getDate_yyyy_mm_dd_HH_MM_SS(), getDate_yyyy_mm_dd_HH_MM_SS()], function (err) {
         if (err) {
             console.log("error", err)
             return;
