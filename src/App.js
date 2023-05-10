@@ -42,11 +42,16 @@ function App() {
 
     const dispatch = useDispatch()
     const socket = useSelector(state => state.socket.socket)
-    socket.on('addNotification', (groupID) => {
-        dispatch(addNotificationID(groupID))
-        dispatch(addNotifications(groupID))
+    const userInfo = useSelector(state => state.userInfo)
+    socket.on('addNotifications', (data) => {
+        console.log("added",data)
+        if (!data.exclusion.includes(userInfo.id)){
+            console.log(data)
+            dispatch(addNotificationID(data.id))
+            dispatch(addNotifications("main"))
+            dispatch(addNotifications(data.id))
+        }
     })
-
 
     return (
             <RouterProvider router={router}/>

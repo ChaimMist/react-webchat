@@ -24,12 +24,15 @@ export const currentSessionSlice = createSlice(
             },
             addMessage: (state, action) => {
                 state.obj.messages.push(action.payload)
+            },
+            setMessage: (state, action) => {
+                state.obj.messages = action.payload
             }
         }
     }
 )
 
-export const {setCurrentSession, addMessage} = currentSessionSlice.actions
+export const {setCurrentSession, addMessage, setMessage} = currentSessionSlice.actions
 
 export default currentSessionSlice.reducer
 

@@ -24,8 +24,8 @@ export const socketSlice = createSlice({
 
         dispatchEvent: (state, action) => {
             state.socket.emit(action.payload[0], action.payload[1])
-            console.log("dispatched event " + action.payload[0] + " with payload " + action.payload[1])
         }
+
     }
 })
 

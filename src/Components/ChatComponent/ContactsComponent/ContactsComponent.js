@@ -13,11 +13,10 @@ let allContacts = []
 export function ContactsComponent() {
     const dispatch = useDispatch()
     const userInfo = useSelector(state => state.userInfo)
-    const socket = useSelector(state => state.socket.socket)
     const [contacts, setContacts] = useState(allContacts)
     const [searchedContacts, setSearchedContacts] = useState([{name: "No Results", phone: ""}])
     const [addedUsers, setAddedUsers] = useState([])
-
+    console.log(userInfo)
     let loader = <div className={"d-flex justify-content-center"}>
         <div className={"spinner-border"} role={"status"}>
             <span className={"sr-only"}></span>
@@ -41,6 +40,8 @@ export function ContactsComponent() {
                 .then((data) => {
                     setSearchedContacts(data)
                 })
+
+
         })
         document.getElementById('contactsInput').addEventListener('input', (e) => {
             let value = e.target.value
@@ -117,28 +118,27 @@ export function ContactsComponent() {
                                             <div className={"w-100 d-flex flex-row justify-content-center"}>No
                                                 results.</div>)
 
-                                        return (
-                                            <div key={index}
-                                                 className={"d-flex flex-row justify-content-between align-items-center"}>
-                                                <div className={"d-flex flex-row"}>
-                                                    <img src={contact.image} width={'50'}
-                                                         alt={"img"}/>
-                                                    <div className={"p-2 d-flex flex-column align-items-center"}>
-                                                        <p>{contact.name}</p>
-                                                        <div
-                                                            className={"text-secondary fw-light contact-subtext position-relative"}>{contact.phone}</div>
-                                                    </div>
+                                        return (<div key={index}
+                                                     className={"d-flex flex-row justify-content-between align-items-center"}>
+                                            <div className={"d-flex flex-row"}>
+                                                <img src={contact.image} width={'50'}
+                                                     alt={"img"}/>
+                                                <div className={"p-2 d-flex flex-column align-items-center"}>
+                                                    <p>{contact.name}</p>
+                                                    <div
+                                                        className={"text-secondary fw-light contact-subtext position-relative"}>{contact.phone}</div>
                                                 </div>
-                                                <div className={"d-flex flex-row"}>
-                                                    <button
-                                                        className={"btn btn-outline-primary " + (addedUsers.id == contact.id ? "disabled" : "")}
-                                                        onClick={() => {
-                                                            setAddedUsers([...addedUsers, contact])
-                                                        }}
-                                                    >Add
-                                                    </button>
-                                                </div>
-                                            </div>)
+                                            </div>
+                                            <div className={"d-flex flex-row"}>
+                                                <button
+                                                    className={"btn btn-outline-primary " + (addedUsers.id == contact.id ? "disabled" : "")}
+                                                    onClick={() => {
+                                                        setAddedUsers([...addedUsers, contact])
+                                                    }}
+                                                >Add
+                                                </button>
+                                            </div>
+                                        </div>)
                                     }) : loader}
                                 </div>
                                 <div className={"addedUsers"}>
@@ -174,33 +174,29 @@ export function ContactsComponent() {
                                     <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Close
                                     </button>
                                     <button type="button" className="btn btn-primary"
-                                            onClick={
-                                                () => {
-                                                    let uuid = uuidv4()
-                                                    fetch('/create-chat', {
-                                                        method: 'POST',
-                                                        headers: {
-                                                            'Content-Type': 'application/json'
-                                                        },
-                                                        body: JSON.stringify({
-                                                            userName: userInfo.name,
-                                                            userImage: userInfo.image,
-                                                            userID: userInfo.id,
-                                                            chatName: document.getElementById('chatNameInput').value,
-                                                            participants: addedUsers,
-                                                            image: "https://chedvata.com/assets/profile.svg",
-                                                            chatID: uuid,
-                                                        }),
-                                                    }).then(() => {
-                                                        setContacts([...contacts, {
-                                                            name: document.getElementById('chatNameInput').value,
-                                                            image: "https://chedvata.com/assets/profile.svg",
-                                                            id: uuid
-                                                        }])
-                                                        dispatch(dispatchEvent(['join', uuid]))
-                                                    })
-                                                }
-                                            }
+                                            onClick={() => {
+                                                let uuid = uuidv4()
+                                                fetch('/create-chat', {
+                                                    method: 'POST', headers: {
+                                                        'Content-Type': 'application/json'
+                                                    }, body: JSON.stringify({
+                                                        userName: userInfo.name,
+                                                        userImage: userInfo.image,
+                                                        userID: userInfo.id,
+                                                        chatName: document.getElementById('chatNameInput').value,
+                                                        participants: addedUsers,
+                                                        image: "https://chedvata.com/assets/profile.svg",
+                                                        chatID: uuid,
+                                                    }),
+                                                }).then(() => {
+                                                    setContacts([...contacts, {
+                                                        name: document.getElementById('chatNameInput').value,
+                                                        image: "https://chedvata.com/assets/profile.svg",
+                                                        id: uuid
+                                                    }])
+                                                    dispatch(dispatchEvent(['join', uuid]))
+                                                })
+                                            }}
                                     >Create
                                     </button>
                                 </div>

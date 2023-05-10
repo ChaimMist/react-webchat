@@ -4,6 +4,11 @@ const mysql = require('mysql');
 const app = express();
 const bodyParser = require('body-parser');
 const server = require('http').createServer();
+const env = require('dotenv')
+
+const dotenv = env.config()
+
+
 const io = require('socket.io')(server, {
     cors: {
         origin: 'http://localhost:3000',
@@ -16,19 +21,17 @@ server.listen(3001, () => {
 
 io.on('connection', (socket) => {
     socket.on('message', (message) => {
-        console.log(`Received message: ${message}`);
-
-
+        console.log(`Received message:`, message);
     });
 
-    socket.on('notify', (groupID) => {
-        console.log(`Received message: ${groupID}`);
-        io.to(groupID).emit('addNotification', groupID)
+    socket.on('notify', (data) => {
+        console.log("notifying", data)
+        io.to(data.id).emit('addNotifications', {id: data.id, exclusion: data.exclusion})
+        io.to(data.id).emit('refetch', data.id)
     });
     socket.on('disconnect', () => {
         console.log('Disconnected from server');
     });
-    socket.emit('message',"hello there from the server side")
 
     socket.on('join', (roomID) => {
         console.log("joined room " + roomID)
@@ -39,16 +42,10 @@ io.on('connection', (socket) => {
 });
 
 
-
-
 //db password: AW23wdaw!
 
-
 const con = mysql.createPool({
-    host: "45.84.204.154",
-    database: "u425671013_WebChat",
-    user: "u425671013_Chaim",
-    password: "AW23wdaw!"
+    host: dotenv.parsed.DB_HOST, database: dotenv.parsed.DB_DATABASE, user: dotenv.parsed.DB_USERNAME, password: dotenv.parsed.DB_PASSWORD
 })
 con.getConnection(function (err) {
     if (err) throw err;
@@ -57,9 +54,6 @@ con.getConnection(function (err) {
 
 app.use(bodyParser.json());
 app.use(express.static('../build'));
-
-
-
 
 
 app.post('/api/login', function (req, res) {
@@ -98,21 +92,23 @@ app.post("/create-chat", function (req, res) {
     let chatID = req.body.chatID
     let participants = req.body.participants
     participants.push({id: userID, name: req.body.userName, image: req.body.userImage})
-    let query = `INSERT INTO chats (id, name, image, created_at, updated_at) VALUES (?, ?, ?, ?, ?)`
-    con.query(query, [chatID, chatName, chatImage,getDate_yyyy_mm_dd_HH_MM_SS(), getDate_yyyy_mm_dd_HH_MM_SS()], function (err, result, fields) {
+    let query = `INSERT INTO chats (id, name, image, created_at, updated_at)
+                 VALUES (?, ?, ?, ?, ?)`
+    con.query(query, [chatID, chatName, chatImage, getDate_yyyy_mm_dd_HH_MM_SS(), getDate_yyyy_mm_dd_HH_MM_SS()], function (err, result, fields) {
         if (err) {
             console.log("error", err)
             return;
         }
         for (let i = 0; i < participants.length; i++) {
-            query = `INSERT INTO chat_participants (chat_id, user_id) VALUES (?, ?)`
+            query = `INSERT INTO chat_participants (chat_id, user_id)
+                     VALUES (?, ?)`
             con.query(query, [chatID, participants[i].id], function (err, result, fields) {
                 if (err) {
                     console.log("error", err)
                 }
             })
         }
-        res.send({success:"true"})
+        res.send({success: "true"})
     })
 })
 
@@ -138,17 +134,19 @@ app.post('/get-contact', function (req, res) {
 app.post('/get-messages', function (req, res) {
     let chatID = req.body.chatID
     let query = `SELECT messages.message, users.name as sender, messages.created_at, messages.user_id
-                    FROM messages
-                    INNER JOIN users ON messages.user_id = users.id
-                    WHERE chat_id = ?
-                    ORDER BY messages.created_at ASC`
+                 FROM messages
+                          INNER JOIN users ON messages.user_id = users.id
+                 WHERE chat_id = ?
+                 ORDER BY messages.created_at ASC`
     con.query(query, [chatID], function (err, result, fields) {
         if (err) {
             console.log("error", err)
             return;
         }
         if (result.length === 0) {
-            res.json([{user_id: "system", sender:"System", message: "No Messages", created_at: getDate_yyyy_mm_dd_HH_MM_SS()}])
+            res.json([{
+                user_id: "system", sender: "System", message: "No Messages", created_at: getDate_yyyy_mm_dd_HH_MM_SS()
+            }])
             return
         }
         res.json(result);
@@ -159,13 +157,14 @@ app.post('/send-message', function (req, res) {
     let chatID = req.body.chatID
     let userID = req.body.userID
     let message = req.body.message
-    let query = `INSERT INTO messages (chat_id, user_id, message, created_at, updated_at) VALUES (?, ?, ?, ?, ?)`
+    let query = `INSERT INTO messages (chat_id, user_id, message, created_at, updated_at)
+                 VALUES (?, ?, ?, ?, ?)`
     con.query(query, [chatID, userID, message, getDate_yyyy_mm_dd_HH_MM_SS(), getDate_yyyy_mm_dd_HH_MM_SS()], function (err, result, fields) {
         if (err) {
             console.log("error", err)
             return;
         }
-        res.send({success:"true"})
+        res.send({success: "true"})
     })
 })
 app.get('/', function (req, res) {
@@ -184,13 +183,12 @@ app.get('/home', function (req, res) {
 });
 
 
-app.listen(3000, function () {
+app.listen(3000,  function () {
     console.log('Server running at http://localhost:3000');
 });
 
 
-
-function getDate_yyyy_mm_dd_HH_MM_SS(){
+function getDate_yyyy_mm_dd_HH_MM_SS() {
     let date = new Date();
     let year = date.getFullYear();
     let month = date.getMonth() + 1;
