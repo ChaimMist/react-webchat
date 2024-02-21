@@ -5,6 +5,7 @@ export const hasMessageSlice = createSlice({
 
     initialState: {
             "main": 0,
+
     },
     reducers: {
         addNotificationID: (state, action) => {

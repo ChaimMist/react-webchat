@@ -45,7 +45,10 @@ io.on('connection', (socket) => {
 //db password: AW23wdaw!
 
 const con = mysql.createPool({
-    host: dotenv.parsed.DB_HOST, database: dotenv.parsed.DB_DATABASE, user: dotenv.parsed.DB_USERNAME, password: dotenv.parsed.DB_PASSWORD
+    host: dotenv.parsed.DB_HOST,
+    database: dotenv.parsed.DB_DATABASE,
+    user: dotenv.parsed.DB_USERNAME,
+    password: dotenv.parsed.DB_PASSWORD
 })
 con.getConnection(function (err) {
     if (err) throw err;
@@ -62,7 +65,7 @@ app.post('/api/login', function (req, res) {
     let query = `SELECT *
                  FROM users
                  WHERE email = ?
-                   AND password = ?`
+                 AND password = ?`
     con.query(query, [email, password], function (err, result) {
         if (err) throw err;
         res.json(result);
@@ -72,7 +75,7 @@ app.post('/get-chats', function (req, res) {
     let userID = req.body.id
     let query = `SELECT id, name, image, updated_at
                  FROM chats
-                 WHERE id in (SELECT chat_id FROM chat_participants WHERE chats.id = chat_id AND user_id = ?)`
+                 WHERE id in (SELECT chat_id FROM chat_participants WHERE chats.id = chat_id AND user_id = ?)`;
     con.query(query, [userID], function (err, result) {
         if (err) {
             res.end("error")
@@ -91,7 +94,15 @@ app.post("/create-chat", function (req, res) {
     let chatImage = req.body.image
     let chatID = req.body.chatID
     let participants = req.body.participants
-    participants.push({id: userID, name: req.body.userName, image: req.body.userImage})
+    participants.push({id: parseInt(userID), name: req.body.userName, image: req.body.userImage})
+
+    if (participants.length === 0) {
+        res.send({success: "false"})
+        return
+    }
+
+    participants = participants.filter((v, i, a) => a.findIndex(t => (t.id === v.id)) === i)
+    console.log(participants)
     let query = `INSERT INTO chats (id, name, image, created_at, updated_at)
                  VALUES (?, ?, ?, ?, ?)`
     con.query(query, [chatID, chatName, chatImage, getDate_yyyy_mm_dd_HH_MM_SS(), getDate_yyyy_mm_dd_HH_MM_SS()], function (err) {
@@ -183,7 +194,7 @@ app.get('/home', function (req, res) {
 });
 
 
-app.listen(3000,  function () {
+app.listen(3000, function () {
     console.log('Server running at http://localhost:3000');
 });
 

@@ -1,9 +1,7 @@
 import React from "react";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
-import {
-    createBrowserRouter, RouterProvider,
-} from "react-router-dom";
+import {createBrowserRouter, RouterProvider,} from "react-router-dom";
 import {HomeComponent} from './Components/HomeComponent/HomeComponent';
 import {SidebarComponent} from './Components/sidebarComponent/sidebar';
 import {ChatComponent} from './Components/ChatComponent/ChatComponent';
@@ -38,9 +36,7 @@ const router = createBrowserRouter([{
 
 ]);
 
-
 function App() {
-
     const dispatch = useDispatch()
     const socket = useSelector(state => state.socket.socket)
     const userInfo = useSelector(state => state.userInfo)
@@ -49,18 +45,18 @@ function App() {
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({userID: userInfo.id})
+        body: JSON.stringify({id: userInfo.id})
     }).then(res => res.json()).then(res => {
         dispatch(setChats(res))
         for (const item of res) {
+            console.log(item)
             dispatch(addNotificationID(item.id))
             dispatch(dispatchEvent(['join', item.id]))
         }
     })
 
     socket.on('addNotifications', (data) => {
-        console.log("added", data)
-        if (!data.senderID === (userInfo.id)) {
+        if (data.senderID != userInfo.id) {
             console.log(data)
             dispatch(addNotificationID(data.id))
             dispatch(addNotifications("main"))

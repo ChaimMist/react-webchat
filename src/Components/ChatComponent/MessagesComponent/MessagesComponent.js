@@ -19,7 +19,7 @@ export function MessagesComponent() {
         if (document.getElementById("sendMessageInput").value === "") return
         let message = document.getElementById("sendMessageInput").value
 
-        fetch("http://localhost:3000/send-message", {
+        fetch("/send-message", {
             method: "POST", headers: {
                 'Content-Type': 'application/json'
             }, body: JSON.stringify({
@@ -27,7 +27,7 @@ export function MessagesComponent() {
             })
         }).then(() => {
             dispatch(dispatchEvent(["notify", {
-                id: currentSession.chatID, senderID: [userInfo.id]
+                id: currentSession.chatID, senderID: userInfo.id
             }]))
             dispatch(addMessage({
                 user_id: userInfo.id,

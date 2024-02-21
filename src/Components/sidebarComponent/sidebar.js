@@ -7,7 +7,7 @@ import {NavLink} from "react-router-dom";
 
 
 export function SidebarComponent() {
-    const notifications= useSelector((state) => state.notificationHash.main);
+    const notifications = useSelector((state) => state.notificationHash.main);
     // const dispatch = useDispatch();
     const [active, setActive] = useState(false);
     // const [loggedIn, setLoggedIn] = useState(false);

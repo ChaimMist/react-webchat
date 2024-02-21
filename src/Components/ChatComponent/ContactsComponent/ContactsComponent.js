@@ -1,5 +1,4 @@
-import {useState} from "react";
-import {useEffect} from "react";
+import {useState, useEffect} from "react";
 import {Contact} from "./Contact/Contact";
 import {useDispatch, useSelector} from "react-redux";
 import {setChats, addChat} from "../../../reduxFeatures/chats";
@@ -24,17 +23,15 @@ export function ContactsComponent() {
         </div>
     </div>
 
+    
     useEffect(() => {
-
         allChats = chats
-
-        document.getElementById('searchContact').addEventListener('change', (e) => {
+        const handleSearchContact = (e) => {
             let value = e.target.value
             if (value.toString() === "") {
                 setSearchedContacts([{name: "No Results", phone: ""}])
                 return
             }
-            console.log("searching", value)
             setSearchedContacts([])
             fetch('/get-contact', {
                 method: 'POST', headers: {
@@ -44,8 +41,8 @@ export function ContactsComponent() {
                 .then((data) => {
                     setSearchedContacts(data)
                 })
-        })
-        document.getElementById('contactsInput').addEventListener('input', (e) => {
+        }
+        const handleContactsInput = (e) => {
             let value = e.target.value
             let contacts = allChats.filter((contact) => {
                 return contact.name.toLowerCase().includes(value.toLowerCase()) || contact.phone.includes(value)
@@ -54,7 +51,14 @@ export function ContactsComponent() {
                 contacts = [{name: "No Results", phone: ""}]
             }
             dispatch(setChats(contacts))
-        });
+        }
+
+        document.getElementById('searchContact').addEventListener('change', handleSearchContact)
+        document.getElementById('contactsInput').addEventListener('input', handleContactsInput)
+
+        return () => {
+
+        }
 
     }, [chats, dispatch, userInfo.id])
 
@@ -74,7 +78,8 @@ export function ContactsComponent() {
             </div>
             <div className={"contacts p-2"}>
                 {chats[0] ? chats.map((chat, index) => {
-                    if (chat.name.toString() === "No Results") return (
+                    console.log(chat)
+                    if (chat.name === "No Results") return (
                         <div className={"w-100 d-flex flex-row justify-content-center"}>No results.</div>)
 
                     return (<Contact key={index} chat={chat}/>)
@@ -159,9 +164,10 @@ export function ContactsComponent() {
                                     </div>
                                 </div>
                                 <div className="modal-footer">
-                                    <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Close
+                                    <button id="addChatCloseBtn" type="button" className="btn btn-secondary"
+                                            data-bs-dismiss="modal">Close
                                     </button>
-                                    <button type="button" className="btn btn-primary" data-bs-dismiss="modal"
+                                    <button type="button" className="btn btn-primary"
                                             onClick={() => {
                                                 let uuid = uuidv4()
                                                 fetch('/create-chat', {
@@ -184,6 +190,7 @@ export function ContactsComponent() {
                                                     }]))
                                                     dispatch(dispatchEvent(['join', uuid]))
                                                     dispatch(addNotificationID(uuid))
+                                                    document.getElementById('addChatCloseBtn').click()
                                                 })
                                             }}
                                     >Create
